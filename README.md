@@ -1,1 +1,1 @@
-# Playing-in-R-NZ-schools-
+# Playing in R (NZ schools)
