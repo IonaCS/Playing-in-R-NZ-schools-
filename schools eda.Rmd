@@ -1,0 +1,101 @@
+---
+title: "NZ Schools"
+author: "Iona Sammons"
+date: "16/03/2021"
+output: html_document
+---
+
+# Introduction
+At this stage, this has no goal, there is no question being looked at or posed. Just some simple EDA and pretty graphs to be done.
+
+
+# Import stuff
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+
+allSchools <- read.csv("../schooldirectory-16-03-2021-083015.csv", header = TRUE, stringsAsFactors = FALSE)
+```
+
+# EDA
+```{r, fig.width=4, fig.height=4}
+# What type of data is in here:
+colnames(allSchools)
+# Counting how many schools there are:
+nrow(allSchools)
+
+# Looking for outliers of decile:
+barplot(table(allSchools$Decile))
+# Looking for outliers of location:
+plot(allSchools$Longitude)
+# Looking for outliers of location:
+plot(allSchools$Latitude)
+# Looking for outliers of student counts:
+plot(allSchools$Total)
+
+# Whether private/public:
+table(allSchools$Authority)
+# Types of schools:
+table(allSchools$Org_Type)
+# Further classification on types of schools:
+table(allSchools$Definition)
+
+# Total number of students:
+sum(allSchools$Total)
+range(allSchools$Total)
+```
+
+## Points of interest
+ - Most deciles are between 1 and 10, some are around 100. *To do: select all rows where Decile greater than 10 and investigate.*
+ - Most longitudes use positive numbers, it appears some have been entered as negatives. *To do: change the negatives to positives.*
+ - There is one school with significantly more students than any of the others. *To do: identify it. It is probably the correspondance school, so that needs to be kept in mind for if the question that ends up being posed relies on student numbers to area relations, as all these students would be accredited to Wellington.*
+ - There are some school roles of zero. *To do: Identify and investigate.*
+ - This EDA (so far) does not check for NULLs/NAs
+ - Many of these columns will require further enquiry for their definitions (e.g. the isolation index, or what makes a school a 'contributing' school).
+ 
+### Investigating errors
+
+#### Deciles
+```{r, Deciles}
+strangeDeciles <- filter(allSchools, allSchools$Decile > 10)
+
+# Number of schools:
+nrow(strangeDeciles)
+
+# Number of children in those schools:
+sum(strangeDeciles$Total)
+
+# Count how many public/private:
+table(strangeDeciles$Authority)
+# Identify the one public school:
+filter(strangeDeciles, strangeDeciles$Authority == "State")
+```
+Turns out the strange deciles are for either private schools or the correspondance school (Te Kura). Thus, there is no decile. Potential ways to deal with this are:
+
+  - Remove them entirely, these are only 33 schools out of 2554 (or 10k students out of 692k students) so they won't affect the data significantly.
+  - Find the average of the private schools that do have deciles and use that.
+  - Get really complicated and identify schools in the same radius of each decile 99 school, average out their deciles and assign that to the decile 99 school. *This would be the most accurate, as surrounding schools would indicate the wealth in the area, but it would no work for rural schools such as Gloriavale.*
+  - Use '5' as that is the middle of the scale. *This would work best for the Te Kura as they teach children across the country.*
+  
+#### Longitudes
+```{r Longitudes}
+negativeLongitudes <- filter(allSchools, allSchools$Longitude < 0)
+negativeLongitudes$Add1_City
+```
+The longitudes are for the three schools in the Chatham Islands. Potential ways to deal with this are:
+  
+  - Remove them from the data set. It is unlikely that these numbers would be relevant to whatever question ends up being posed.
+  
+With that in mind, we can now have a quick look to get an idea of where the schools are in the country:
+  
+```{r Map}
+allMainlandSchools <- filter(allSchools, allSchools$Longitude > 0)
+plot(allMainlandSchools$Longitude, allMainlandSchools$Latitude)
+```
+
+#### Student numbers
+Note: It was confirmed in the Decile section that the school with ~5000 students was the correspondence school. Refer the section where the one public school was identified.
+```{r Student numbers}
+lowStudentNumbers <- filter(allSchools, allSchools$Total < 20)
+```
+
+## Cleaning
