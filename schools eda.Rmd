@@ -96,6 +96,34 @@ plot(allMainlandSchools$Longitude, allMainlandSchools$Latitude)
 Note: It was confirmed in the Decile section that the school with ~5000 students was the correspondence school. Refer the section where the one public school was identified.
 ```{r Student numbers}
 lowStudentNumbers <- filter(allSchools, allSchools$Total < 20)
-```
 
-## Cleaning
+# Frequency of low student numbers:
+barplot(table(lowStudentNumbers$Total))
+# Where those schools are:
+table(lowStudentNumbers$Urban_Area)
+# The type of organisation:
+table(lowStudentNumbers$Org_Type)
+```
+The numbers in the tables suggest that the schools with no students might be skewing the types of schools and where they are. They need to be seperated out
+
+```{r No students}
+noStudents <- filter(lowStudentNumbers, lowStudentNumbers$Total == 0)
+
+# Where those schools are:
+table(noStudents$Urban_Area)
+# The type of organisation:
+table(noStudents$Org_Type)
+```
+The schools with no students are mostly activity centres and teen parent units in urban areas. It makes sense for there to be no registered students for them as students often don't go to these places for a full year. They would also be registered to different schools, and they should not be double counted.
+
+```{r 1-19 students}
+oneTo19Students <- filter(lowStudentNumbers, lowStudentNumbers$Total != 0)
+
+# Where those schools are:
+table(oneTo19Students$Urban_Area)
+# The type of organisation:
+table(oneTo19Students$Org_Type)
+```
+Schools with low student roles are mostly rural schools and normal primary though to high schools.
+
+## Areas to look at:
