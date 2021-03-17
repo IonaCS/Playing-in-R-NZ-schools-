@@ -127,3 +127,10 @@ table(oneTo19Students$Org_Type)
 Schools with low student roles are mostly rural schools and normal primary though to high schools.
 
 ## Areas to look at:
+
+ - Where different decile schools are in NZ (e.g. dot them on a map and colour code them based on decile).
+    + Perhaps combine this with crime data too?
+ - Where teen parenting units are.
+    + Again, combine with something, such as crime or deciles.
+ - Look at ethnic makeup in relation to deciles, locations and/or 
+    + This is dicey teritory, be mindful if you pursue this route!
